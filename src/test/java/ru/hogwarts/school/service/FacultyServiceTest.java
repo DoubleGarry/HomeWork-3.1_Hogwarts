@@ -1,4 +1,5 @@
 package ru.hogwarts.school.service;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.hogwarts.school.model.Faculty;
@@ -20,7 +21,7 @@ class FacultyServiceTest {
     @Test
     void addFacultyTest() {
         Faculty student = new Faculty(0, "faculty", "green");
-        assertThat(out.addFaculty(student)).isEqualTo(new Faculty(4, "faculty", "green"));
+        Assertions.assertThat(out.addFaculty(student)).isEqualTo(new Faculty(4, "faculty", "green"));
     }
 
     @Test
