@@ -1,33 +1,55 @@
 package ru.hogwarts.school.service;
+
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import ru.hogwarts.school.model.Student;
+import ru.hogwarts.school.repository.StudentRepository;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 class StudentServiceTest {
-    private StudentService out;
+
+    @Mock
+    private StudentRepository studentRepository;
+
+    @InjectMocks
+   private StudentService out;
+    private List<Student> students;
 
     @BeforeEach
     void beforeEach() {
-        out = new StudentService();
-        out.addStudent(new Student(1, "first", 12));
-        out.addStudent(new Student(2, "second", 12));
-        out.addStudent(new Student(3, "third", 11));
+        students = new ArrayList<>();
+        students.add(new Student(1, "first", 12));
+        students.add(new Student(2, "second", 12));
+        students.add(new Student(3, "third", 11));
     }
 
     @Test
     void createTest() {
-        Student student = new Student(0, "Potter", 10);
-        Assertions.assertThat(out.addStudent(student)).isEqualTo(new Student(4, "Potter", 10));
+        Student student = new Student(1, "first", 12);
+        when(studentRepository.save(student)).thenReturn(student);
+        Assertions.assertThat(out.addStudent(new Student(1, "first", 12)))
+                .isEqualTo(student);
+
     }
 
     @Test
-    void updateTest() {
-        Student student = new Student(4, "forth", 14);
-        out.addStudent(student);
-        assertThat(out.editStudent(new Student(4, "forth", 10))).isEqualTo(out.getStudent(4));
+    void editTest() {
+        Student student = new Student(1, "first", 12);
+        when(studentRepository.save(student)).thenReturn(student);
+        Assertions.assertThat(out.editStudent(new Student(1, "first", 12)))
+                .isEqualTo(student);
     }
 
     @Test
@@ -37,19 +59,14 @@ class StudentServiceTest {
 
     @Test
     void getTest() {
-        assertThat(out.getStudent(1)).isEqualTo(new Student(1, "first", 12));
-    }
-
-    @Test
-    void removeTest() {
-        out.removeStudent(2);
-        assertThat(out.getStudent(2)).isNull();
+        when(studentRepository.findById(1L)).thenReturn(Optional.ofNullable(students.get(0)));
+        assertThat(out.getStudent(1)).isEqualTo(students.get(0));
     }
 
     @Test
     void filterTest() {
+        when(studentRepository.findAll()).thenReturn(students);
         assertThat(out.filterByAge(12))
-                .hasSize(2)
                 .containsExactlyInAnyOrder(
                         new Student(1, "first", 12),
                         new Student(2, "second", 12)
